@@ -1,0 +1,3 @@
+[submodule "ext/verisol"]
+	path = ext/verisol
+	url = https://github.com/allisterb/verisol.git
