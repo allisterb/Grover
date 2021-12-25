@@ -1,0 +1,2 @@
+#!/bin/bash
+dotnet build src/Grover.CLI/Grover.CLI.csproj 
