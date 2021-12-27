@@ -10,3 +10,6 @@
 [submodule "ext/bytecodetranslator"]
 	path = ext/bytecodetranslator
 	url = https://github.com/allisterb/bytecodetranslator.git
+[submodule "ext/cci-bct"]
+	path = ext/cci-bct
+	url = https://github.com/allisterb/cci.git
