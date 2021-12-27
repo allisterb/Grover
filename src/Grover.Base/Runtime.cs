@@ -42,9 +42,9 @@ public abstract class Runtime
     }
     public Runtime(CancellationToken ct)
     {
-        CancellationToken = ct;
+        Ct = ct;
     }
-    public Runtime(): this(Cts.Token) {}
+    public Runtime() : this(Cts.Token) { }
     #endregion
 
     #region Properties
@@ -52,23 +52,21 @@ public abstract class Runtime
 
     public static string Config(string i) => Configuration[i];
 
-    public static Logger Logger { get; protected set; }
-
-    public static CancellationTokenSource Cts { get; } = new CancellationTokenSource();
-
-    public static CancellationToken Ct { get; } = Cts.Token;
-
-    public static HttpClient DefaultHttpClient { get; } = new HttpClient();
-
-    public static string YY = DateTime.Now.Year.ToString().Substring(2, 2);
-
-    public bool Initialized { get; protected set; }
-
     public static bool IsKubernetesPod { get; }
 
     public static bool IsAzureFunction { get; set; }
 
-    public CancellationToken CancellationToken { get; protected set; }
+    public static Logger Logger { get; protected set; }
+
+    public static CancellationTokenSource Cts { get; } = new CancellationTokenSource();
+
+    public static CancellationToken Ct { get; protected set; } = Cts.Token;
+
+    public static HttpClient DefaultHttpClient { get; } = new HttpClient();
+
+    public static string AssemblyLocation { get; } = Path.GetDirectoryName(Assembly.GetAssembly(typeof(Runtime))!.Location)!;
+
+    public bool Initialized { get; protected set; }
     #endregion
 
     #region Methods

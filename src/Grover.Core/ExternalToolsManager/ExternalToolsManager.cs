@@ -15,7 +15,6 @@ public static class ExternalToolsManager
 
     static ExternalToolsManager()
     {
-        
         Logger = new ConsoleLogger();
         IConfiguration toolSourceConfig = new ConfigurationBuilder()
             .AddJsonFile("toolsourcesettings.json", true, true)

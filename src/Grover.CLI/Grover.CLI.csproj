@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\ext\bytecodetranslator\BytecodeTranslator\ByteCodeTranslator.NET6.csproj" />
     <ProjectReference Include="..\Grover.Base\Grover.Base.csproj" />
   </ItemGroup>
 

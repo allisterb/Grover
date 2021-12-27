@@ -6,6 +6,13 @@ using System.Runtime.InteropServices;
 
 public abstract class ToolManager : Runtime
 {
+    #region Constructors
+    internal ToolManager(ToolSourceSettings settings) : base()
+    {
+        this.settings = settings;
+    }
+    #endregion
+
     #region Properties
     protected static string OsName
     {
@@ -52,11 +59,6 @@ public abstract class ToolManager : Runtime
     #endregion
 
     #region Methods
-    internal ToolManager(ToolSourceSettings settings)
-    {
-        this.settings = settings;
-    }
-
     internal abstract void EnsureExisted();
 
     protected bool Exists()

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Grover.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "bct foo"
+    }
+  }
+}

@@ -48,10 +48,11 @@ class Program : Runtime
             SetLogger(new SerilogLogger(console: true, debug: false));
         }
         PrintLogo();
-        ParserResult<object> result = new Parser().ParseArguments<Options, RoslynOptions>(args);
-        result.WithParsed<RoslynOptions>(o =>
+        ParserResult<object> result = new Parser().ParseArguments<Options, BctOptions>(args);
+        result.WithParsed<BctOptions>(o =>
         {
-
+            var asm = @"C:\Projects\Grover\src\TestProjects\Grover.TestProject1\bin\Debug\net6.0\Grover.TestProject1.dll";
+            BytecodeTranslator.BCT.Main(asm);
         })
         #region Print options help
         .WithNotParsed((IEnumerable<Error> errors) =>
@@ -126,7 +127,7 @@ class Program : Runtime
     private static Version AssemblyVersion { get; } = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version!;
     private static FigletFont Font { get; } = FigletFont.Load("chunky.flf");
 
-    static Type[] OptionTypes = { typeof(Options), typeof(RoslynOptions)};
+    static Type[] OptionTypes = { typeof(Options), typeof(BctOptions)};
     static Dictionary<string, Type> OptionTypesMap { get; } = new Dictionary<string, Type>();
     #endregion
 

@@ -8,7 +8,7 @@ namespace Grover.CLI
         [Option('d', "debug", Required = false, HelpText = "Enable debug mode.")]
         public bool Debug { get; set; }
 
-        [Value(0, Required = true, Max = 1, HelpText = "The source file or project file to analyze.")]
+        [Value(0, Required = true, HelpText = "The source file or project file to analyze.")]
         public string File { get; set; } = string.Empty;
 
         public static Dictionary<string, object> Parse(string o)
@@ -36,8 +36,8 @@ namespace Grover.CLI
         }
     }
 
-    [Verb("roslyn", HelpText = "Translate to Roslyn.")]
-    public class RoslynOptions : Options 
+    [Verb("bct", HelpText = "Translate a .NET bytecode assembly to Boogie.")]
+    public class BctOptions : Options 
     {
         [Option('p', "print", Required = false, HelpText = "Print the Roslyn AST for the specified file(s).")]
         public bool Print { get; set; }

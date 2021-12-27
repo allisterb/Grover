@@ -34,7 +34,6 @@ namespace Grover.ExternalTools
         private string InstallDotnetCliTool()
         {
             var logStr = $"... Installing {this.settings.Name} as we could not find it from {this.settings.CommandPath}.";
-            Console.WriteLine(logStr); // until we have better verbosity for printing
             ExternalToolsManager.Log(logStr);
 
             Process p = new Process();
