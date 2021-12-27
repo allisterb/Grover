@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{F386
 		..\grover.cmd = ..\grover.cmd
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Grover.Core", "Grover.Core\Grover.Core.csproj", "{8FE6E306-EF67-473C-B0D0-23545B50351A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +122,12 @@ Global
 		{6F7D65B9-62FB-40F9-A217-433F16916322}.DebugCommandLine|Any CPU.Build.0 = Debug|Any CPU
 		{6F7D65B9-62FB-40F9-A217-433F16916322}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F7D65B9-62FB-40F9-A217-433F16916322}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FE6E306-EF67-473C-B0D0-23545B50351A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FE6E306-EF67-473C-B0D0-23545B50351A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FE6E306-EF67-473C-B0D0-23545B50351A}.DebugCommandLine|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FE6E306-EF67-473C-B0D0-23545B50351A}.DebugCommandLine|Any CPU.Build.0 = Debug|Any CPU
+		{8FE6E306-EF67-473C-B0D0-23545B50351A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FE6E306-EF67-473C-B0D0-23545B50351A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

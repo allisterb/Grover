@@ -6,6 +6,7 @@ using CommandLine;
 using CommandLine.Text;
 
 using Grover;
+
 #region Enums
 public enum ExitResult
 {
@@ -60,7 +61,7 @@ class Program : Runtime
             help.Copyright = "";
             if (errors.Any(e => e.Tag == ErrorType.VersionRequestedError))
             {
-                help.Heading = new HeadingInfo("Modzy.NET", AssemblyVersion.ToString(3));
+                help.Heading = new HeadingInfo("Grover", AssemblyVersion.ToString(3));
                 help.Copyright = new CopyrightInfo("Allister Beharry", new int[] { 2021 });
                 Info(help);
                 Exit(ExitResult.SUCCESS);
