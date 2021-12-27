@@ -7,3 +7,6 @@
 [submodule "ext/dafny"]
 	path = ext/dafny
 	url = https://github.com/dafny-lang/dafny.git
+[submodule "ext/bytecodetranslator"]
+	path = ext/bytecodetranslator
+	url = https://github.com/allisterb/bytecodetranslator.git
