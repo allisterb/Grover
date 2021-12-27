@@ -4,3 +4,6 @@
 [submodule "ext/corral"]
 	path = ext/corral
 	url = https://github.com/allisterb/corral.git
+[submodule "ext/dafny"]
+	path = ext/dafny
+	url = https://github.com/dafny-lang/dafny.git
