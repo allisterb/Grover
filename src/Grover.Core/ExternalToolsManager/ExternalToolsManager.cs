@@ -1,4 +1,4 @@
-﻿namespace Grover.ExternalTools;
+﻿namespace Grover;
 
 using System;
 using Microsoft.Extensions.Configuration;
@@ -6,35 +6,32 @@ using Microsoft.Extensions.Configuration;
 
 public static class ExternalToolsManager
 {
-    public static Logger Logger;
+    private static Logger Logger;
 
-    public static ToolManager Solc { get; set; }
+    public static IConfiguration ToolSourceConfig = new ConfigurationBuilder()
+            .AddJsonFile(Path.Combine("ExternalToolsManager", "toolsourcesettings.json"), false, false)
+            .Build();
     public static ToolManager Z3 { get; private set; }
     public static ToolManager Boogie { get; private set; }
+    /*
     public static ToolManager Corral { get; private set; }
-
+    */
     static ExternalToolsManager()
     {
         Logger = new ConsoleLogger();
-        IConfiguration toolSourceConfig = new ConfigurationBuilder()
-            .AddJsonFile("toolsourcesettings.json", true, true)
-            .Build();
-
-        var solcSourceSettings = new ToolSourceSettings();
-        toolSourceConfig.GetSection("solc").Bind(solcSourceSettings);
-        Solc = new SolcManager(solcSourceSettings);
-
         var z3SourceSettings = new ToolSourceSettings();
-        toolSourceConfig.GetSection("z3").Bind(z3SourceSettings);
+        ToolSourceConfig.GetSection("z3").Bind(z3SourceSettings);
         Z3 = new DownloadedToolManager(z3SourceSettings);
 
         var boogieSourceSettings = new ToolSourceSettings();
-        toolSourceConfig.GetSection("boogie").Bind(boogieSourceSettings);
+        ToolSourceConfig.GetSection("boogie").Bind(boogieSourceSettings);
         Boogie = new DotnetCliToolManager(boogieSourceSettings);
 
+        /*
         var corralSourceSettings = new ToolSourceSettings();
-        toolSourceConfig.GetSection("corral").Bind(corralSourceSettings);
+        ToolSourceConfig.GetSection("corral").Bind(corralSourceSettings);
         Corral = new DotnetCliToolManager(corralSourceSettings);
+        */
     }
 
     internal static void Log(string v)
@@ -42,17 +39,17 @@ public static class ExternalToolsManager
         Logger.Debug(v);
     }
 
-    public static void EnsureAllExisted()
+    public static void EnsureAllExists()
     {
-        Solc.EnsureExisted();
+        //Z3.EnsureExists();
 
-        Z3.EnsureExisted();
-
-        Boogie.EnsureExisted();
+        Boogie.EnsureExists();
         ((DotnetCliToolManager) Boogie).EnsureLinkedToZ3(Z3);
 
+        /*
         Corral.EnsureExisted();
         ((DotnetCliToolManager) Corral).EnsureLinkedToZ3(Z3);
+        */
     }
 }
 

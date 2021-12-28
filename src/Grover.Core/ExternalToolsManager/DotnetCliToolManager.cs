@@ -1,4 +1,4 @@
-namespace Grover.ExternalTools
+namespace Grover
 {
     using System;
     using System.Diagnostics;
@@ -6,62 +6,61 @@ namespace Grover.ExternalTools
 
     internal class DotnetCliToolManager : ToolManager
     {
-        internal string DependencyTargetPath
-        {
-            get
-            {
-                return Path.Combine(this.settings.CommandPath, this.settings.DependencyRelativePath);
-            }
-        }
-
+        #region Constructor
         internal DotnetCliToolManager(ToolSourceSettings settings) : base(settings)
         {
         }
+        #endregion
 
-        internal override void EnsureExisted()
+        #region Methods
+        internal string DependencyTargetPath
         {
-            EnsureCommandPathExisted();
+            get => Path.Combine(this.settings.CommandPath, this.settings.DependencyRelativePath);
+        }
+
+        internal override void EnsureExists()
+        {
+            EnsureCommandPathExists();
             if (!Exists())
             {
                 InstallDotnetCliTool();
             }
             else
             {
-                ExternalToolsManager.Log($"Skip installing tool {this.settings.Name} as we could find it under {this.settings.CommandPath}.");
+                Info(".NET CLI tool {0} exists in {1}.", this.settings.Name, this.settings.CommandPath);
             }
         }
 
         private string InstallDotnetCliTool()
         {
-            var logStr = $"... Installing {this.settings.Name} as we could not find it from {this.settings.CommandPath}.";
-            ExternalToolsManager.Log(logStr);
-
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardInput = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = "dotnet";
-            p.StartInfo.Arguments = $"tool install {this.settings.Name} --tool-path {this.settings.CommandPath} --version {this.settings.Version}";
-            p.Start();
-
-            string output = p.StandardOutput.ReadToEnd();
-            string errorMsg = p.StandardError.ReadToEnd();
-
-            p.StandardOutput.Close();
-            p.StandardError.Close();
-
-            if (!String.IsNullOrEmpty(errorMsg))
+            using (var op = Runtime.Begin("Installing .NET tool {0} into {1}.", this.settings.Name, this.settings.CommandPath))
+            using (Process p = new Process()) 
             {
-                ExternalToolsManager.Log($"Installation failed: {errorMsg}");
-            }
-            else
-            {
-                ExternalToolsManager.Log("Done.");
-            }
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardInput = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardError = true;
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = "dotnet";
+                p.StartInfo.Arguments = $"tool install {this.settings.Name} --tool-path {this.settings.CommandPath} --version {this.settings.Version}";
+                p.Start();
+                string output = p.StandardOutput.ReadToEnd();
+                string errorMsg = p.StandardError.ReadToEnd();
+                p.StandardOutput.Close();
+                p.StandardError.Close();
 
-            return output;
+                if (!String.IsNullOrEmpty(errorMsg))
+                {
+                    Error("Installation error: {0}", errorMsg);
+                    op.Cancel();
+                    return output;
+                }
+                else
+                {
+                    op.Complete();
+                    return output;
+                }
+            }
         }
 
         internal void EnsureLinkedToZ3(ToolManager z3)
@@ -76,14 +75,12 @@ namespace Grover.ExternalTools
 
             if (!File.Exists(z3DependencyPath))
             {
-                ExternalToolsManager.Log($"Z3 does not exist under {this.settings.Name}");
-                ExternalToolsManager.Log($"Copying {z3.Command} to {z3DependencyPath}");
+                Info("Copying {0} to {1}.", z3.Command, z3DependencyPath);
                 File.Copy(z3.Command, z3DependencyPath);
             }
             else
             {
-                ExternalToolsManager.Log($"Z3 already exists under {this.settings.Name}");
-                ExternalToolsManager.Log("Skip copying");
+                Info("Z3 exists in {0}.", this.settings.Name);
             }
         }
 
@@ -91,5 +88,6 @@ namespace Grover.ExternalTools
         {
             return this.DependencyTargetPath + z3.ExeName;
         }
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-namespace Grover.ExternalTools
+namespace Grover
 {
     using System;
     using System.Diagnostics;
@@ -69,9 +69,9 @@ namespace Grover.ExternalTools
         {
         }
 
-        internal override void EnsureExisted()
+        internal override void EnsureExists()
         {
-            EnsureCommandPathExisted();
+            EnsureCommandPathExists();
 
             if (!Exists())
             {

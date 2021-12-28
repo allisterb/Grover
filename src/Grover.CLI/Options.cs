@@ -36,6 +36,9 @@ namespace Grover.CLI
         }
     }
 
+    [Verb("install", HelpText = "Install any required runtime dependencies.")]
+    public class InstallOptions : Options { }
+
     [Verb("bct", HelpText = "Translate a .NET bytecode assembly to Boogie.")]
     public class BctOptions : Options 
     {

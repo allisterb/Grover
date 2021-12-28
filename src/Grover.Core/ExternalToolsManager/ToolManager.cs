@@ -1,4 +1,4 @@
-﻿namespace Grover.ExternalTools;
+﻿namespace Grover;
 
 using System.IO;
 using System.Runtime.InteropServices;
@@ -59,14 +59,14 @@ public abstract class ToolManager : Runtime
     #endregion
 
     #region Methods
-    internal abstract void EnsureExisted();
+    internal abstract void EnsureExists();
 
     protected bool Exists()
     {
         return File.Exists(this.Command);
     }
 
-    protected void EnsureCommandPathExisted()
+    protected void EnsureCommandPathExists()
     {
         if (!Directory.Exists(this.settings.CommandPath))
         {

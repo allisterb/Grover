@@ -48,12 +48,25 @@ class Program : Runtime
             SetLogger(new SerilogLogger(console: true, debug: false));
         }
         PrintLogo();
-        ParserResult<object> result = new Parser().ParseArguments<Options, BctOptions>(args);
-        result.WithParsed<BctOptions>(o =>
+
+        if (args.Length == 1 && args.Contains("install"))
+        {
+            args = args.Append("dummy").ToArray(); //Use a dummy file for install option
+        }
+        #region Parse options
+        ParserResult<object> result = new Parser().ParseArguments<Options, InstallOptions, BctOptions>(args);
+        result.WithParsed<InstallOptions>(o =>
+        {
+            ExternalToolsManager.EnsureAllExists();
+        })
+        .WithParsed<BctOptions>(o =>
         {
             var asm = @"C:\Projects\Grover\src\TestProjects\Grover.TestProject1\bin\Debug\net6.0\Grover.TestProject1.dll";
             BytecodeTranslator.BCT.Main(asm);
         })
+        
+        #endregion
+
         #region Print options help
         .WithNotParsed((IEnumerable<Error> errors) =>
         {
@@ -127,7 +140,7 @@ class Program : Runtime
     private static Version AssemblyVersion { get; } = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version!;
     private static FigletFont Font { get; } = FigletFont.Load("chunky.flf");
 
-    static Type[] OptionTypes = { typeof(Options), typeof(BctOptions)};
+    static Type[] OptionTypes = { typeof(Options), typeof(InstallOptions), typeof(BctOptions)};
     static Dictionary<string, Type> OptionTypesMap { get; } = new Dictionary<string, Type>();
     #endregion
 

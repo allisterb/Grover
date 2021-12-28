@@ -1,4 +1,4 @@
-namespace Grover.ExternalTools;
+namespace Grover;
 
 using System;
 using System.Collections.Generic;
