@@ -56,6 +56,8 @@ public abstract class Runtime
 
     public static bool IsAzureFunction { get; set; }
 
+    public static string PathSeparator { get; } = Environment.OSVersion.Platform == PlatformID.Win32NT ? "\\" : "/";
+
     public static Logger Logger { get; protected set; }
 
     public static CancellationTokenSource Cts { get; } = new CancellationTokenSource();

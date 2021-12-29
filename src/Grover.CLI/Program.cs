@@ -47,9 +47,10 @@ class Program : Runtime
         {
             SetLogger(new SerilogLogger(console: true, debug: false));
         }
+
         PrintLogo();
 
-        if (args.Length == 1 && args.Contains("install"))
+        if (args.Contains("install") && (args.Length == 1 || (args.Length == 2 && (args.Contains("--debug") || args.Contains("-d")))))
         {
             args = args.Append("dummy").ToArray(); //Use a dummy file for install option
         }

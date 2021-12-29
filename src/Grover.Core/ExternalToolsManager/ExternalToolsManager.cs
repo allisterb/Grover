@@ -1,9 +1,7 @@
 ﻿namespace Grover;
 
-using System;
 using Microsoft.Extensions.Configuration;
     
-
 public static class ExternalToolsManager
 {
     private static Logger Logger;
@@ -12,10 +10,11 @@ public static class ExternalToolsManager
             .AddJsonFile(Path.Combine("ExternalToolsManager", "toolsourcesettings.json"), false, false)
             .Build();
     public static ToolManager Z3 { get; private set; }
+    
     public static ToolManager Boogie { get; private set; }
-    /*
+    
     public static ToolManager Corral { get; private set; }
-    */
+    
     static ExternalToolsManager()
     {
         Logger = new ConsoleLogger();
@@ -27,11 +26,9 @@ public static class ExternalToolsManager
         ToolSourceConfig.GetSection("boogie").Bind(boogieSourceSettings);
         Boogie = new DotnetCliToolManager(boogieSourceSettings);
 
-        /*
         var corralSourceSettings = new ToolSourceSettings();
         ToolSourceConfig.GetSection("corral").Bind(corralSourceSettings);
-        Corral = new DotnetCliToolManager(corralSourceSettings);
-        */
+        Corral = new DotnetCliToolManager(corralSourceSettings);        
     }
 
     internal static void Log(string v)
@@ -41,7 +38,7 @@ public static class ExternalToolsManager
 
     public static void EnsureAllExists()
     {
-        //Z3.EnsureExists();
+        Z3.EnsureExists();
 
         Boogie.EnsureExists();
         ((DotnetCliToolManager) Boogie).EnsureLinkedToZ3(Z3);

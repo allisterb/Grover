@@ -86,7 +86,8 @@ namespace Grover
 
         private string GetZ3DependencyPath(ToolManager z3)
         {
-            return this.DependencyTargetPath + z3.ExeName;
+            return Path.Combine(this.DependencyTargetPath.Replace("/", PathSeparator), z3.ExeName);
+
         }
         #endregion
     }

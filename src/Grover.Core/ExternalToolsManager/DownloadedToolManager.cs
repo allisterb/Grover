@@ -37,7 +37,7 @@ namespace Grover
         {
             get
             {
-                return this.settings.CommandPath + "Temp/";
+                return Path.Combine(this.settings.CommandPath, "Temp");
             }
         }
 
@@ -45,7 +45,7 @@ namespace Grover
         {
             get
             {
-                return this.TempDirectory + this.ZipFileName;
+                return Path.Combine(this.TempDirectory, this.ZipFileName);
             }
         }
 
@@ -53,7 +53,7 @@ namespace Grover
         {
             get
             {
-                return this.TempDirectory + this.settings.Name + "/";
+                return Path.Combine(this.TempDirectory, this.settings.Name);
             }
         }
 
@@ -61,7 +61,7 @@ namespace Grover
         {
             get
             {
-                return this.ExtractPath + this.ExePathWithinZip;
+                return Path.Combine(this.ExtractPath, this.ExePathWithinZip);
             }
         }
 
@@ -80,7 +80,7 @@ namespace Grover
             }
             else
             {
-                ExternalToolsManager.Log($"Skip installing tool {this.settings.Name} as we could find it under {this.settings.CommandPath}.");
+                Info("{0} exists in {1}.", this.settings.Name, this.settings.CommandPath);
             }
         }
 
@@ -108,10 +108,10 @@ namespace Grover
             string errorMsg = p.StandardError.ReadToEnd();
             if (!String.IsNullOrEmpty(errorMsg))
             {
-                ExternalToolsManager.Log($"Error: {errorMsg}");
+                Error(errorMsg);
             }
 
-            ExternalToolsManager.Log(outputBinary);
+            Info(outputBinary);
             p.StandardOutput.Close();
             p.StandardError.Close();
         }
@@ -123,18 +123,16 @@ namespace Grover
 
         protected void DownloadAndUnZip()
         {
-            PrepareTempDirectory();
-            Download();
-
-            ExternalToolsManager.Log($"Extracting {ZipFileName} to {ExtractPath}");
-            ZipFile.ExtractToDirectory(ZipFilePath, ExtractPath);
-
-            CopyToCommand(ExeTempPath);
-
-            ExternalToolsManager.Log($"Cleaning up");
-            File.Delete(ZipFilePath);
-            Directory.Delete(ExtractPath, true);
-            ExternalToolsManager.Log($"Done");
+            using (var op = Begin("Download and unzip {0} to {1}.", this.settings.Name, ExtractPath))
+            {
+                PrepareTempDirectory();
+                Download();
+                ZipFile.ExtractToDirectory(ZipFilePath, ExtractPath);
+                CopyToCommand(ExeTempPath);
+                File.Delete(ZipFilePath);
+                Directory.Delete(ExtractPath, true);
+                op.Complete();
+            }
         }
 
         protected void DownloadAndCopy()
@@ -142,10 +140,7 @@ namespace Grover
             PrepareTempDirectory();
             Download();
             CopyToCommand(ZipFilePath);
-
-            ExternalToolsManager.Log($"Cleaning up");
             File.Delete(ZipFilePath);
-            ExternalToolsManager.Log($"Done");
         }
 
         protected void CreateSymbolicLink()
@@ -160,20 +155,20 @@ namespace Grover
         {
             if (!Directory.Exists(TempDirectory))
             {
-                ExternalToolsManager.Log($"Creating temporary directory {TempDirectory}");
+                Debug("Creating temporary directory {0}.", TempDirectory);
                 Directory.CreateDirectory(TempDirectory);
             }
             else
             {
                 if (File.Exists(ZipFilePath))
                 {
-                    ExternalToolsManager.Log($"Deleting file {ZipFilePath}");
+                    Debug("Deleting file {0}.", ZipFilePath);
                     File.Delete(ZipFilePath);
                 }
 
                 if (Directory.Exists(ExtractPath))
                 {
-                    ExternalToolsManager.Log($"Deleting directory {ExtractPath}");
+                    Debug("Deleting directory {0}.", ExtractPath);
                     Directory.Delete(ExtractPath, true);
                 }
             }
@@ -181,19 +176,18 @@ namespace Grover
 
         private void CopyToCommand(string exeTempPath)
         {
-            ExternalToolsManager.Log($"Copying {exeTempPath} to {Command}");
+            Debug("Copying {0} to {1}.", exeTempPath, Command);
             File.Copy(exeTempPath, Command);
         }
 
         private void Download()
         {
 #pragma warning disable SYSLIB0014 // Type or member is obsolete
+            using (var op = Begin("Downloading {0} from {1} to {2}", this.settings.Name, DownloadURL, TempDirectory))
             using (var client = new WebClient())
             {
-                var logStr = $"... Downloading {ZipFileName} from {DownloadURL} to {TempDirectory}";
-                Console.WriteLine(logStr); // until we have better verbosity
-                ExternalToolsManager.Log(logStr);
                 client.DownloadFile(DownloadURL, ZipFilePath);
+                op.Complete();
             }
 #pragma warning restore SYSLIB0014 // Type or member is obsolete
         }
