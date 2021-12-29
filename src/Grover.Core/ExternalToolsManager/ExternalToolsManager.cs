@@ -43,10 +43,20 @@ public static class ExternalToolsManager
         Boogie.EnsureExists();
         ((DotnetCliToolManager) Boogie).EnsureLinkedToZ3(Z3);
 
-        /*
-        Corral.EnsureExisted();
+        Corral.EnsureExists();
         ((DotnetCliToolManager) Corral).EnsureLinkedToZ3(Z3);
-        */
+        
+        Runtime.Info("All required external tools installed.");
+    }
+
+    public static string[] GetVersionInfo()
+    {
+        return new string[] 
+        { 
+            Runtime.RunCmd("z3", "/version") ?? "Error running z3 /version.", 
+            Runtime.RunCmd("boogie", "/version") ?? "Error running boogie /version.", 
+            (Runtime.RunCmd("corral") ?? "Error running corral.").Split(Environment.NewLine).First()
+        };
     }
 }
 

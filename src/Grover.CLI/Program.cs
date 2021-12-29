@@ -50,7 +50,7 @@ class Program : Runtime
 
         PrintLogo();
 
-        if (args.Contains("install") && (args.Length == 1 || (args.Length == 2 && (args.Contains("--debug") || args.Contains("-d")))))
+        if (args.Contains("install"))
         {
             args = args.Append("dummy").ToArray(); //Use a dummy file for install option
         }
@@ -59,6 +59,13 @@ class Program : Runtime
         result.WithParsed<InstallOptions>(o =>
         {
             ExternalToolsManager.EnsureAllExists();
+            if(o.Info)
+            {
+                foreach(var vi in ExternalToolsManager.GetVersionInfo())
+                {
+                    Con.WriteLine(vi);
+                }
+            }
         })
         .WithParsed<BctOptions>(o =>
         {

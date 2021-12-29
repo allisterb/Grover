@@ -17,5 +17,10 @@
     "Name": "boogie",
     "Version": "2.11.1",
     "DependencyRelativePath": ".store/boogie/2.11.1/boogie/2.11.1/tools/net6.0/any/"
+  },
+  "Corral": {
+    "Name": "corral",
+    "Version": "1.1.8",
+    "DependencyRelativePath": ".store/corral/1.1.8/corral/1.1.8/tools/net5.0/any/"
   }
 }

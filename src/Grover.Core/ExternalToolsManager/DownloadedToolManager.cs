@@ -92,29 +92,7 @@ namespace Grover
             }
         }
 
-        private void RunCmd(string cmdName, string arguments)
-        {
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardInput = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = cmdName;
-            p.StartInfo.Arguments = $"{arguments}";
-            p.Start();
-
-            string outputBinary = p.StandardOutput.ReadToEnd();
-            string errorMsg = p.StandardError.ReadToEnd();
-            if (!String.IsNullOrEmpty(errorMsg))
-            {
-                Error(errorMsg);
-            }
-
-            Info(outputBinary);
-            p.StandardOutput.Close();
-            p.StandardError.Close();
-        }
+        
 
         protected virtual void Install()
         {

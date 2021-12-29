@@ -80,7 +80,7 @@ namespace Grover
             }
             else
             {
-                Info("Z3 exists in {0}.", this.settings.Name);
+                Info("Dependency {0} exists at {1}.", "z3", z3DependencyPath);
             }
         }
 

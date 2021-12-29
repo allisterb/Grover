@@ -113,5 +113,46 @@ public abstract class Runtime
     {
         if (!this.Initialized) throw new RuntimeNotInitializedException(this);
     }
+
+    public static string? RunCmd(string cmdName, string arguments = "")
+    {
+        using (Process p = new Process())
+        {
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardInput = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.FileName = cmdName;
+            p.StartInfo.Arguments = $"{arguments}";
+            try
+            {
+                p.Start();
+                string outputBinary = p.StandardOutput.ReadToEnd();
+                string errorMsg = p.StandardError.ReadToEnd();
+
+                if (!String.IsNullOrEmpty(errorMsg))
+                {
+                    Error(errorMsg);
+                    return null;
+                }
+                else
+                {
+                    Debug("Command {0} {1} returned {2}", cmdName, arguments, outputBinary.Trim());
+                    return outputBinary.Trim();
+                }
+            }
+            catch (Exception ex)
+            {
+                Error(ex, "Error executing command {0} {1}", cmdName, arguments);
+                return null;
+            }
+            finally
+            {
+                p.StandardOutput.Close();
+                p.StandardError.Close();
+            }
+        }
+    }
     #endregion
 }
