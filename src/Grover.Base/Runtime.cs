@@ -1,8 +1,10 @@
 namespace Grover;
 
+using System.Net;
 using System.Reflection;
 
 using Microsoft.Extensions.Configuration;
+using Spectre.Console;
 
 public abstract class Runtime
 {
@@ -17,14 +19,14 @@ public abstract class Runtime
                 .AddEnvironmentVariables()
                 .Build();
         }
-        else if (Assembly.GetEntryAssembly()?.GetName().Name == "Modzy.CLI" && Environment.GetEnvironmentVariable("USERNAME") == "Allister")
+        else if (Assembly.GetEntryAssembly()?.GetName().Name == "Grover.CLI" && Environment.GetEnvironmentVariable("USERNAME") == "Allister")
         {
             Configuration = new ConfigurationBuilder()
                 .AddUserSecrets("c0697968-04fe-49d7-a785-aaa817e38935")
                 .AddEnvironmentVariables()
                 .Build();
         }
-        else if (Assembly.GetEntryAssembly()?.GetName().Name == "Modzy.CLI" && Environment.GetEnvironmentVariable("USERNAME") != "Allister")
+        else if (Assembly.GetEntryAssembly()?.GetName().Name == "Grover.CLI")
         {
             Configuration = new ConfigurationBuilder()
             .AddJsonFile("config.json", optional: true)
@@ -38,7 +40,7 @@ public abstract class Runtime
             .Build();
         }
 
-        DefaultHttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Modzy.NET/0.1");
+        DefaultHttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Grover/" + AssemblyVersion.ToString(2));
     }
     public Runtime(CancellationToken ct)
     {
@@ -67,6 +69,8 @@ public abstract class Runtime
     public static HttpClient DefaultHttpClient { get; } = new HttpClient();
 
     public static string AssemblyLocation { get; } = Path.GetDirectoryName(Assembly.GetAssembly(typeof(Runtime))!.Location)!;
+
+    public static Version AssemblyVersion { get; } = Assembly.GetAssembly(typeof(Runtime))!.GetName().Version!;
 
     public bool Initialized { get; protected set; }
     #endregion
@@ -124,7 +128,7 @@ public abstract class Runtime
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.FileName = cmdName;
-            p.StartInfo.Arguments = $"{arguments}";
+            p.StartInfo.Arguments = arguments;
             try
             {
                 p.Start();
@@ -153,6 +157,47 @@ public abstract class Runtime
                 p.StandardError.Close();
             }
         }
+    }
+
+    public static void DownloadFile(string name, Uri downloadUrl, string downloadPath, bool useConsole = false)
+    {
+        #pragma warning disable SYSLIB0014 // Type or member is obsolete
+        using (var op = Begin("Downloading {0} from {1} to {2}", name, downloadUrl, downloadPath))
+        {
+            using (var client = new WebClient())
+            {
+                if (useConsole)
+                {
+                    AnsiConsole.Progress().Start(ctx =>
+                    {
+                        var task = ctx.AddTask($"[bold white]Download[/] [bold cyan]{downloadUrl}[/]");
+                        client.DownloadProgressChanged += (object sender, DownloadProgressChangedEventArgs e) =>
+                        {
+                            task.Value = 100.0 * ((double) e.BytesReceived / (double) e.TotalBytesToReceive);
+                        };
+                        client.DownloadDataCompleted += (object sender, DownloadDataCompletedEventArgs e) =>
+                        {
+                            task.StopTask();
+                        };
+                        client.DownloadFileAsync(downloadUrl, downloadPath);
+                        while (!task.IsFinished);
+                    });
+                    op.Complete();
+                }
+                else
+                {
+                    client.DownloadFile(downloadUrl, downloadPath);
+                    op.Complete();
+                }
+            }
+           
+        }
+        #pragma warning restore SYSLIB0014 // Type or member is obsolete
+    }
+
+    private static void Cl(object sender, DownloadDataCompletedEventArgs e)
+    {
+        throw new NotImplementedException();
     }
     #endregion
 }

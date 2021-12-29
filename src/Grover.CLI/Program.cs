@@ -145,7 +145,6 @@ class Program : Runtime
     #endregion
 
     #region Properties
-    private static Version AssemblyVersion { get; } = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version!;
     private static FigletFont Font { get; } = FigletFont.Load("chunky.flf");
 
     static Type[] OptionTypes = { typeof(Options), typeof(InstallOptions), typeof(BctOptions)};

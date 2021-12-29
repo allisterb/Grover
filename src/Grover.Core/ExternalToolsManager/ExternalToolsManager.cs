@@ -31,11 +31,6 @@ public static class ExternalToolsManager
         Corral = new DotnetCliToolManager(corralSourceSettings);        
     }
 
-    internal static void Log(string v)
-    {
-        Logger.Debug(v);
-    }
-
     public static void EnsureAllExists()
     {
         Z3.EnsureExists();

@@ -161,12 +161,13 @@ namespace Grover
         private void Download()
         {
 #pragma warning disable SYSLIB0014 // Type or member is obsolete
-            using (var op = Begin("Downloading {0} from {1} to {2}", this.settings.Name, DownloadURL, TempDirectory))
-            using (var client = new WebClient())
-            {
-                client.DownloadFile(DownloadURL, ZipFilePath);
-                op.Complete();
-            }
+            //using (var op = Begin("Downloading {0} from {1} to {2}", this.settings.Name, DownloadURL, TempDirectory))
+            //using (var client = new WebClient())
+            //{
+            //    client.DownloadFile(DownloadURL, ZipFilePath);
+            //    op.Complete();
+            //}
+            DownloadFile(this.settings.Name, new Uri(DownloadURL), ZipFilePath, true);
 #pragma warning restore SYSLIB0014 // Type or member is obsolete
         }
     }
