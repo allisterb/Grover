@@ -8,9 +8,6 @@ namespace Grover.CLI
         [Option('d', "debug", Required = false, HelpText = "Enable debug mode.")]
         public bool Debug { get; set; }
 
-        [Value(0, Required = true, HelpText = "The source file or project file to analyze.")]
-        public string File { get; set; } = string.Empty;
-
         public static Dictionary<string, object> Parse(string o)
         {
             Dictionary<string, object> options = new Dictionary<string, object>();
@@ -41,7 +38,13 @@ namespace Grover.CLI
     {
         [Option('i', "info", Required = false, HelpText = "Print version information for installed external tools.")]
         public bool Info { get; set; }
+    }
 
+    [Verb("boogie", HelpText = "Execute the installed Boogie tool with the specified options.")]
+    public class BoogieOptions : Options
+    {
+        [Value(0, Required = true, HelpText = "The options to pass to Boogie.")]
+        public IEnumerable<string> Options { get; set; } = Array.Empty<string>();
     }
 
     [Verb("bct", HelpText = "Translate a .NET bytecode assembly to Boogie.")]

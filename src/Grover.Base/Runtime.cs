@@ -58,6 +58,8 @@ public abstract class Runtime
 
     public static bool IsAzureFunction { get; set; }
 
+    public static bool EnableConsole { get; set; } = false;
+
     public static string PathSeparator { get; } = Environment.OSVersion.Platform == PlatformID.Win32NT ? "\\" : "/";
 
     public static Logger Logger { get; protected set; }
@@ -159,14 +161,14 @@ public abstract class Runtime
         }
     }
 
-    public static void DownloadFile(string name, Uri downloadUrl, string downloadPath, bool useConsole = false)
+    public static void DownloadFile(string name, Uri downloadUrl, string downloadPath)
     {
         #pragma warning disable SYSLIB0014 // Type or member is obsolete
         using (var op = Begin("Downloading {0} from {1} to {2}", name, downloadUrl, downloadPath))
         {
             using (var client = new WebClient())
             {
-                if (useConsole)
+                if (EnableConsole)
                 {
                     AnsiConsole.Progress().Start(ctx =>
                     {

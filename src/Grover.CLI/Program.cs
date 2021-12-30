@@ -26,6 +26,7 @@ class Program : Runtime
     static Program()
     {
         AppDomain.CurrentDomain.UnhandledException += Program_UnhandledException;
+        EnableConsole = true;
         Console.CancelKeyPress += Console_CancelKeyPress;
         Console.OutputEncoding = Encoding.UTF8;
         foreach (var t in OptionTypes)
@@ -50,12 +51,8 @@ class Program : Runtime
 
         PrintLogo();
 
-        if (args.Contains("install"))
-        {
-            args = args.Append("dummy").ToArray(); //Use a dummy file for install option
-        }
         #region Parse options
-        ParserResult<object> result = new Parser().ParseArguments<Options, InstallOptions, BctOptions>(args);
+        ParserResult<object> result = new Parser().ParseArguments<Options, InstallOptions, BoogieOptions, BctOptions>(args);
         result.WithParsed<InstallOptions>(o =>
         {
             ExternalToolsManager.EnsureAllExists();
@@ -65,6 +62,18 @@ class Program : Runtime
                 {
                     Con.WriteLine(vi);
                 }
+            }
+        })
+        .WithParsed<BoogieOptions>(o =>
+        {
+            var ret = RunCmd("boogie", o.Options.Aggregate((a, b) => a + " " + b));
+            if (ret is not null)
+            {
+                Con.Write($"[bold white]{ret.EscapeMarkup()}[/]".ToMarkup());
+            }
+            else
+            {
+                Error("Error executing Boogie.");
             }
         })
         .WithParsed<BctOptions>(o =>
@@ -147,7 +156,7 @@ class Program : Runtime
     #region Properties
     private static FigletFont Font { get; } = FigletFont.Load("chunky.flf");
 
-    static Type[] OptionTypes = { typeof(Options), typeof(InstallOptions), typeof(BctOptions)};
+    static Type[] OptionTypes = { typeof(Options), typeof(InstallOptions), typeof(BoogieOptions), typeof(BctOptions)};
     static Dictionary<string, Type> OptionTypesMap { get; } = new Dictionary<string, Type>();
     #endregion
 

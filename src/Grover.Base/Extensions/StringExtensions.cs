@@ -1,5 +1,7 @@
 namespace Grover;
 
+using Spectre.Console;
+
 public static class StringExtensions
 {
     public static bool IsEmpty(this string s) => s == "";
@@ -40,6 +42,8 @@ public static class StringExtensions
                     StringComparison.InvariantCultureIgnoreCase) ? -1 : 1);
         }
     }
+
+    public static Markup ToMarkup(this string s) => new Markup(s);
 
     private static Dictionary<string, int> numberTable = new Dictionary<string, int>
     {{"zero",0},{"one",1},{"two",2},{"three",3},{"four",4},

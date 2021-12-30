@@ -167,7 +167,7 @@ namespace Grover
             //    client.DownloadFile(DownloadURL, ZipFilePath);
             //    op.Complete();
             //}
-            DownloadFile(this.settings.Name, new Uri(DownloadURL), ZipFilePath, true);
+            DownloadFile(this.settings.Name, new Uri(DownloadURL), ZipFilePath);
 #pragma warning restore SYSLIB0014 // Type or member is obsolete
         }
     }
