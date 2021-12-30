@@ -13,3 +13,6 @@
 [submodule "ext/cci-bct"]
 	path = ext/cci-bct
 	url = https://github.com/allisterb/cci.git
+[submodule "ext/tests/CirrusAPITestContract"]
+	path = ext/tests/CirrusAPITestContract
+	url = https://github.com/TjadenFroyda/CirrusAPITestContract.git
