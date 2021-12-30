@@ -2,7 +2,7 @@
   "profiles": {
     "Grover.CLI": {
       "commandName": "Project",
-      "commandLineArgs": "boogie /print C:\\Projects\\Grover\\src\\Grover.Base\\bin\\Debug\\net6.0\\Grover.Base.bpl"
+      "commandLineArgs": "bct"
     }
   }
 }

@@ -78,7 +78,7 @@ class Program : Runtime
         })
         .WithParsed<BctOptions>(o =>
         {
-            var asm = @"C:\Projects\Grover\src\TestProjects\Grover.TestProject1\bin\Debug\net6.0\Grover.TestProject1.dll";
+            var asm = @"C:\Projects\Grover\src\TestProjects\Grover.TestProject1\bin\Debug\netstandard2.0\Grover.TestProject1.dll";
             BytecodeTranslator.BCT.Main(asm);
         })
         
