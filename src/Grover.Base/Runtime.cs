@@ -114,6 +114,17 @@ public abstract class Runtime
     [DebuggerStepThrough]
     public static Logger.Op Begin(string messageTemplate, params object[] args) => Logger.Begin(messageTemplate, args);
 
+    [DebuggerStepThrough]
+    public static T GetTimed<T>(Func<T> p, string status, string messageTemplate, params object[] o)
+    {
+        T ret;
+        using (var op = Begin(messageTemplate, o))
+        {
+            ret = AnsiConsole.Status().Spinner(Spinner.Known.Dots).Start($"{status}...", ctx => p());
+            op.Complete();
+        }
+        return ret;
+    }
 
     public void FailIfNotInitialized()
     {

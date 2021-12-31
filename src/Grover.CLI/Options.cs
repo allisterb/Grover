@@ -47,10 +47,20 @@ namespace Grover.CLI
         public IEnumerable<string> Options { get; set; } = Array.Empty<string>();
     }
 
-    [Verb("bct", HelpText = "Translate a .NET bytecode assembly to Boogie.")]
-    public class BctOptions : Options 
+    [Verb("translate", HelpText = "Translate a .NET bytecode assembly or project to Boogie.")]
+    public class TranslateOptions : Options 
     {
-        [Option('p', "print", Required = false, HelpText = "Print the Roslyn AST for the specified file(s).")]
-        public bool Print { get; set; }
+        [Value(0, Required = true, HelpText = "The file to translate.")]
+        public string File { get; set; } = String.Empty;
+    }
+
+    [Verb("assembly", HelpText = "Analyze a .NET bytecode assembly.")]
+    public class AssemblyOptions : Options
+    {
+        [Value(0, Required = true, HelpText = "The assembly file (*.dll or *.exe) to analyze.")]
+        public string File { get; set; } = String.Empty;
+
+        [Option('r', "references", Required = false, HelpText = "Print references.")]
+        public bool References { get; set; }
     }
 }

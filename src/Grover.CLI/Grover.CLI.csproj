@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Colorful.Console" Version="1.2.15" />
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
@@ -22,6 +23,7 @@
     <ProjectReference Include="..\..\ext\bytecodetranslator\BytecodeTranslator\ByteCodeTranslator.NET6.csproj" />
     <ProjectReference Include="..\Grover.Base\Grover.Base.csproj" />
     <ProjectReference Include="..\Grover.Core\Grover.Core.csproj" />
+    <ProjectReference Include="..\Grover.Metadata\Grover.Metadata.csproj" />
   </ItemGroup>
 
   <ItemGroup>

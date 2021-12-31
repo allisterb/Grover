@@ -1,5 +1,6 @@
 ﻿namespace Grover.CLI;
 
+using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using CommandLine;
@@ -29,7 +30,7 @@ class Program : Runtime
         EnableConsole = true;
         Console.CancelKeyPress += Console_CancelKeyPress;
         Console.OutputEncoding = Encoding.UTF8;
-        foreach (var t in OptionTypes)
+        foreach (var t in optionTypes)
         {
             OptionTypesMap.Add(t.Name, t);
         }
@@ -52,7 +53,7 @@ class Program : Runtime
         PrintLogo();
 
         #region Parse options
-        ParserResult<object> result = new Parser().ParseArguments<Options, InstallOptions, BoogieOptions, BctOptions>(args);
+        ParserResult<object> result = new Parser().ParseArguments<Options, InstallOptions, AssemblyOptions, BoogieOptions, TranslateOptions>(args);
         result.WithParsed<InstallOptions>(o =>
         {
             ExternalToolsManager.EnsureAllExists();
@@ -62,6 +63,14 @@ class Program : Runtime
                 {
                     Con.WriteLine(vi);
                 }
+            }
+        })
+        .WithParsed<AssemblyOptions>(o =>
+        {
+            if (o.References)
+            {
+                AssemblyCmd.References(o.File);
+                Exit(ExitResult.SUCCESS);
             }
         })
         .WithParsed<BoogieOptions>(o =>
@@ -76,10 +85,23 @@ class Program : Runtime
                 Error("Error executing Boogie.");
             }
         })
-        .WithParsed<BctOptions>(o =>
+        .WithParsed<TranslateOptions>(o =>
         {
-            var asm = @"C:\Projects\Grover\src\TestProjects\Grover.TestProject1\bin\Debug\netstandard2.0\Grover.TestProject1.dll";
-            BytecodeTranslator.BCT.Main(asm);
+            if (!File.Exists(o.File))
+            {
+                Error("The file {0} does not exist.", o.File);
+                Exit(ExitResult.INVALID_OPTIONS);
+
+            }
+            if (o.File.EndsWith(".dll") || o.File.EndsWith(".exe"))
+            {
+                using (var op = Begin("Translating .NET assembly {0} to Boogie IVL", o.File))
+                {
+                    var ret = BytecodeTranslator.BCT.TranslateAssemblyAndWriteOutput(new List<string> { o.File }, new BytecodeTranslator.GeneralHeap(), new BytecodeTranslator.Options(), new List<Regex>(), false);
+                    op.Complete();
+                }
+            }
+            
         })
         
         #endregion
@@ -106,7 +128,7 @@ class Program : Runtime
                 }
                 else
                 {
-                    help.AddVerbs(OptionTypes);
+                    help.AddVerbs(optionTypes);
                 }
                 Info(help.ToString().Replace("--", ""));
                 Exit(ExitResult.SUCCESS);
@@ -122,7 +144,7 @@ class Program : Runtime
             }
             else if (errors.Any(e => e.Tag == ErrorType.NoVerbSelectedError))
             {
-                help.AddVerbs(OptionTypes);
+                help.AddVerbs(optionTypes);
                 Info(help);
                 Exit(ExitResult.INVALID_OPTIONS);
             }
@@ -136,7 +158,7 @@ class Program : Runtime
             else if (errors.Any(e => e.Tag == ErrorType.UnknownOptionError))
             {
                 UnknownOptionError error = (UnknownOptionError)errors.First(e => e.Tag == ErrorType.UnknownOptionError);
-                help.AddVerbs(OptionTypes);
+                help.AddVerbs(optionTypes);
                 Error("Unknown option: {error}.", error.Token);
                 Info(help);
                 Exit(ExitResult.INVALID_OPTIONS);
@@ -144,7 +166,7 @@ class Program : Runtime
             else
             {
                 Error("An error occurred parsing the program options: {errors}.", errors);
-                help.AddVerbs(OptionTypes);
+                help.AddVerbs(optionTypes);
                 Info(help);
                 Exit(ExitResult.INVALID_OPTIONS);
             }
@@ -156,7 +178,7 @@ class Program : Runtime
     #region Properties
     private static FigletFont Font { get; } = FigletFont.Load("chunky.flf");
 
-    static Type[] OptionTypes = { typeof(Options), typeof(InstallOptions), typeof(BoogieOptions), typeof(BctOptions)};
+    
     static Dictionary<string, Type> OptionTypesMap { get; } = new Dictionary<string, Type>();
     #endregion
 
@@ -164,7 +186,7 @@ class Program : Runtime
 
     static void PrintLogo()
     {
-        Con.Write(new FigletText(Font, "Grover").LeftAligned().Color(Color.Blue));
+        Con.Write(new FigletText(Font, "Grover").LeftAligned().Color(Spectre.Console.Color.Blue));
         Con.Write(new Text($"v{AssemblyVersion.ToString(3)}\n").LeftAligned());
     }
 
@@ -211,7 +233,8 @@ class Program : Runtime
     #endregion
 
     #region Fields
-    private static object _uilock = new object();
+    static object _uilock = new object();
+    static Type[] optionTypes = { typeof(Options), typeof(InstallOptions), typeof(AssemblyOptions), typeof(BoogieOptions), typeof(TranslateOptions) };
     #endregion
 }
 
