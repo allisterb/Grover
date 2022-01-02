@@ -27,7 +27,7 @@ class Program : Runtime
     static Program()
     {
         AppDomain.CurrentDomain.UnhandledException += Program_UnhandledException;
-        EnableConsole = true;
+        Interactive = true;
         Console.CancelKeyPress += Console_CancelKeyPress;
         Console.OutputEncoding = Encoding.UTF8;
         foreach (var t in optionTypes)
@@ -97,7 +97,12 @@ class Program : Runtime
             {
                 using (var op = Begin("Translating .NET assembly {0} to Boogie IVL", o.File))
                 {
-                    var ret = BytecodeTranslator.BCT.TranslateAssemblyAndWriteOutput(new List<string> { o.File }, new BytecodeTranslator.GeneralHeap(), new BytecodeTranslator.Options(), new List<Regex>(), false);
+                    var a = new Grover.Metadata.Assembly(o.File);
+                    var files = new List<string> ();
+                    //files.AddRange(a.References.Where(r => r.ResolverData is not null).Select(r => r.ResolverData!.File.FullName));
+                    files.Add(o.File);
+                    Info("Assemblies to translate: {0}.", files);
+                    var ret = BytecodeTranslator.BCT.TranslateAssemblyAndWriteOutput(files, new BytecodeTranslator.GeneralHeap(), new BytecodeTranslator.Options(), new List<Regex>(), false);
                     op.Complete();
                 }
             }

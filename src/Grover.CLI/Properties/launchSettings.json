@@ -2,7 +2,7 @@
   "profiles": {
     "Grover.CLI": {
       "commandName": "Project",
-      "commandLineArgs": "bct"
+      "commandLineArgs": "translate C:\\Projects\\Grover\\tests\\TestProjects\\Grover.TestProject1\\bin\\Debug\\net6.0\\Grover.TestProject1.dll"
     }
   }
 }

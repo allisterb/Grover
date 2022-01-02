@@ -4,32 +4,79 @@ using System.Reflection;
 using Microsoft.Cci;
 using Microsoft.Cci.MutableContracts;
 
-using Nuclear.Assemblies.Runtimes;
+using Nuclear.Assemblies;
 using Nuclear.Assemblies.Resolvers;
+using Nuclear.Assemblies.ResolverData;
 using Nuclear.Assemblies.Resolvers.Internal;
-public readonly record struct AssemblyReference(IAssemblyReference Ref, IAssembly Resolved, string path);
+public readonly record struct AssemblyReference(IAssemblyReference Ref, IAssemblyResolverData? ResolverData);
 public class Assembly : Runtime
 {
     #region Constructors
     public Assembly(string assemblyPath)
-    {
-        Host = new CodeContractAwareHostEnvironment(new string[] { new FileInfo(assemblyPath).DirectoryName! }, true, true);
+    { 
+        Directory = new FileInfo(assemblyPath).Directory!;
+        Host = new CodeContractAwareHostEnvironment(new string[] { Directory.FullName }, true, true);
         Module = (IModule)Host.LoadUnitFrom(assemblyPath);
-
-        References = Module.AssemblyReferences.Select(a => new AssemblyReference(a, a.ResolvedAssembly, a.ResolvedAssembly.Location));
-
-        //NugetResolver.
+        References = Module.AssemblyReferences.Select(a => new AssemblyReference(a, TryResolve(a, Directory.FullName)));
     }
     #endregion
 
     #region Properties
+    public DirectoryInfo Directory { get; init; }
     public CodeContractAwareHostEnvironment Host { get; init; }
     public IModule Module { get; init; }
 
     public IEnumerable<AssemblyReference> References { get; init; }
+  
+    internal static DefaultResolver DefaultResolver { get; } = new DefaultResolver(VersionMatchingStrategies.SemVer, SearchOption.AllDirectories);
+    internal static NugetResolver NugetResolver {get; } = new NugetResolver(VersionMatchingStrategies.SemVer, VersionMatchingStrategies.SemVer);
+    #endregion
 
-    internal static DefaultResolver DefaultResolver { get; } = new DefaultResolver(VersionMatchingStrategies.Strict, SearchOption.AllDirectories);
-    internal static ICoreNugetResolver NugetResolver {get; } = new NugetResolver(VersionMatchingStrategies.Strict, VersionMatchingStrategies.Strict).CoreResolver;
+    #region Methods
+    public static IAssemblyResolverData? TryResolve(AssemblyName name, string searchPath)
+    {
+        var defaultResolverData = DefaultResolver.CoreResolver.Resolve(name, new DirectoryInfo(searchPath), SearchOption.AllDirectories, VersionMatchingStrategies.Strict);
+        if (defaultResolverData is not null && defaultResolverData.Any())
+        {
+            Debug("Resolved assembly {0} using default resolver.", name);
+            return defaultResolverData.First();
+        }
+        else
+        {
+            
+            var netcorecachdir = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages", "microsoft.netcore.app"));
+            var netcoreResolverData = netcorecachdir.Exists ? DefaultResolver.CoreResolver.Resolve(name, netcorecachdir, SearchOption.AllDirectories, VersionMatchingStrategies.SemVer) : null;
+            if (netcoreResolverData is not null && netcoreResolverData.Any())
+            {
+                Debug("Resolved assembly {0} using .NET Core resolver.", name);
+                return netcoreResolverData.First();
+            }
+            else
+            {
+                NugetResolver.TryResolve(name, out var nugetResolverData);
+                if (nugetResolverData is not null && nugetResolverData.Any())
+                {
+                    return nugetResolverData.First();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+    }
+
+    public static IAssemblyResolverData? TryResolve(IAssemblyReference r, string searchPath)
+    {
+        var name = new AssemblyName(r.Name.Value)
+        {
+            Version =  r.Version,
+            CultureName = r.Culture,
+        };
+        name.SetPublicKey(r.PublicKey.Any() ? r.PublicKey.ToArray() : null);
+        name.SetPublicKeyToken(r.PublicKeyToken.Any() ? r.PublicKeyToken.ToArray() : null);
+        return TryResolve(name, searchPath);
+    }
     #endregion
 }
 

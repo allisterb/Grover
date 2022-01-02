@@ -14,7 +14,7 @@ public class AssemblyCmd : Runtime
             Program.Exit(ExitResult.NOT_FOUND);
         }
         Assembly asm = GetTimed(() => new Assembly(path), "Loading assembly", "Loading assembly {0}", path);
-        Info("References:{0}", asm.References.Select(r => r.Ref));
+        Info("References:{0}", asm.References.Select(r => r.Ref.ToString() + ": " + (r.ResolverData?.File.FullName ?? "Not resolved")));
     }
 }
 

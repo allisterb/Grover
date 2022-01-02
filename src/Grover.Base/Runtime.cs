@@ -54,11 +54,11 @@ public abstract class Runtime
 
     public static string Config(string i) => Configuration[i];
 
+    public static bool Interactive { get; set; } = false;
+
     public static bool IsKubernetesPod { get; }
 
     public static bool IsAzureFunction { get; set; }
-
-    public static bool EnableConsole { get; set; } = false;
 
     public static string PathSeparator { get; } = Environment.OSVersion.Platform == PlatformID.Win32NT ? "\\" : "/";
 
@@ -120,7 +120,7 @@ public abstract class Runtime
         T ret;
         using (var op = Begin(messageTemplate, o))
         {
-            ret = AnsiConsole.Status().Spinner(Spinner.Known.Dots).Start($"{status}...", ctx => p());
+            ret = Interactive ? AnsiConsole.Status().Spinner(Spinner.Known.Dots).Start($"{status}...", ctx => p()) : p();
             op.Complete();
         }
         return ret;
@@ -179,7 +179,7 @@ public abstract class Runtime
         {
             using (var client = new WebClient())
             {
-                if (EnableConsole)
+                if (Interactive)
                 {
                     AnsiConsole.Progress().Start(ctx =>
                     {
