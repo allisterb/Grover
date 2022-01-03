@@ -47,6 +47,13 @@ namespace Grover.CLI
         public IEnumerable<string> Options { get; set; } = Array.Empty<string>();
     }
 
+    [Verb("ssc", HelpText = "Execute the installed SpecSharp tool with the specified options.")]
+    public class SpecSharpOptions : Options
+    {
+        [Value(0, Required = true, HelpText = "The options to pass to the SpecSharp CLI tool.")]
+        public IEnumerable<string> Options { get; set; } = Array.Empty<string>();
+    }
+
     [Verb("translate", HelpText = "Translate a .NET bytecode assembly or project to Boogie.")]
     public class TranslateOptions : Options 
     {

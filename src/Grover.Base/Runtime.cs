@@ -131,7 +131,7 @@ public abstract class Runtime
         if (!this.Initialized) throw new RuntimeNotInitializedException(this);
     }
 
-    public static string? RunCmd(string cmdName, string arguments = "")
+    public static string? RunCmd(string cmdName, string arguments = "", string? workingDir = null)
     {
         using (Process p = new Process())
         {
@@ -142,6 +142,10 @@ public abstract class Runtime
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.FileName = cmdName;
             p.StartInfo.Arguments = arguments;
+            if (workingDir is not null)
+            {
+                p.StartInfo.WorkingDirectory = workingDir;
+            }
             try
             {
                 p.Start();

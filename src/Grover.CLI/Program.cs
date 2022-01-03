@@ -53,7 +53,7 @@ class Program : Runtime
         PrintLogo();
 
         #region Parse options
-        ParserResult<object> result = new Parser().ParseArguments<Options, InstallOptions, AssemblyOptions, BoogieOptions, TranslateOptions>(args);
+        ParserResult<object> result = new Parser().ParseArguments<Options, InstallOptions, AssemblyOptions, BoogieOptions, SpecSharpOptions, TranslateOptions>(args);
         result.WithParsed<InstallOptions>(o =>
         {
             ExternalToolsManager.EnsureAllExists();
@@ -83,6 +83,18 @@ class Program : Runtime
             else
             {
                 Error("Error executing Boogie.");
+            }
+        })
+        .WithParsed<SpecSharpOptions>(o =>
+        {
+            var ret = RunCmd(Path.Combine(AssemblyLocation, "bin", "ssc"), o.Options.Aggregate((a, b) => a + " " + b), Path.Combine(AssemblyLocation, "bin"));
+            if (ret is not null)
+            {
+                Con.Write($"[bold white]{ret.EscapeMarkup()}[/]".ToMarkup());
+            }
+            else
+            {
+                Error("Error executing ssc.");
             }
         })
         .WithParsed<TranslateOptions>(o =>
@@ -239,7 +251,7 @@ class Program : Runtime
 
     #region Fields
     static object _uilock = new object();
-    static Type[] optionTypes = { typeof(Options), typeof(InstallOptions), typeof(AssemblyOptions), typeof(BoogieOptions), typeof(TranslateOptions) };
+    static Type[] optionTypes = { typeof(Options), typeof(InstallOptions), typeof(AssemblyOptions), typeof(BoogieOptions), typeof(SpecSharpOptions), typeof(TranslateOptions) };
     #endregion
 }
 
