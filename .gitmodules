@@ -16,3 +16,6 @@
 [submodule "ext/tests/CirrusAPITestContract"]
 	path = ext/tests/CirrusAPITestContract
 	url = https://github.com/TjadenFroyda/CirrusAPITestContract.git
+[submodule "ext/specsharp"]
+	path = ext/specsharp
+	url = https://github.com/allisterb/specsharp-ms.git
