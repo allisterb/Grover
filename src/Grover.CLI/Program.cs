@@ -87,14 +87,21 @@ class Program : Runtime
         })
         .WithParsed<SpecSharpOptions>(o =>
         {
-            var ret = RunCmd(Path.Combine(AssemblyLocation, "bin", "ssc"), o.Options.Aggregate((a, b) => a + " " + b), Path.Combine(AssemblyLocation, "bin"));
-            if (ret is not null)
+            if (o.Compile)
             {
-                Con.Write($"[bold white]{ret.EscapeMarkup()}[/]".ToMarkup());
+                Commands.SscCmd.Compile(o.Options.First());
             }
             else
             {
-                Error("Error executing ssc.");
+                var ret = RunCmd(Path.Combine(AssemblyLocation, "bin", "ssc"), o.Options.Aggregate((a, b) => a + " " + b), Path.Combine(AssemblyLocation, "bin"));
+                if (ret is not null)
+                {
+                    Con.Write($"[bold white]{ret.EscapeMarkup()}[/]".ToMarkup());
+                }
+                else
+                {
+                    Error("Error executing ssc.");
+                }
             }
         })
         .WithParsed<TranslateOptions>(o =>
