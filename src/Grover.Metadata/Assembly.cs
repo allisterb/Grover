@@ -43,26 +43,16 @@ public class Assembly : Runtime
         }
         else
         {
-            
-            var netcorecachdir = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages", "microsoft.netcore.app"));
-            var netcoreResolverData = netcorecachdir.Exists ? DefaultResolver.CoreResolver.Resolve(name, netcorecachdir, SearchOption.AllDirectories, VersionMatchingStrategies.SemVer) : null;
-            if (netcoreResolverData is not null && netcoreResolverData.Any())
+            NugetResolver.TryResolve(name, out var nugetResolverData);
+            if (nugetResolverData is not null && nugetResolverData.Any())
             {
-                Debug("Resolved assembly {0} using .NET Core resolver.", name);
-                return netcoreResolverData.First();
+                Debug("Resolved assembly {0} using NuGet resolver.", name);
+                return nugetResolverData.First();
             }
             else
             {
-                NugetResolver.TryResolve(name, out var nugetResolverData);
-                if (nugetResolverData is not null && nugetResolverData.Any())
-                {
-                    return nugetResolverData.First();
-                }
-                else
-                {
-                    return null;
-                }
-            }
+                return null;
+            }   
         }
     }
 
